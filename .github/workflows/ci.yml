@@ -43,7 +43,7 @@ jobs:
       run: msbuild $env:Solution_Name1 -t:build -p:Configuration=$env:Configuration -p:Platform=x64
     
     - name: Restore Solution 2
-      run: msbuild $env:Solution_Name2 /t:Restore /p:Configuration=$env:Configuration /p:RestorePackagesConfig:true
+      run: msbuild $env:Solution_Name2 /t:Restore /p:Configuration=$env:Configuration /p:RestorePackagesConfig=true
 
     - name: Build
       run: |
