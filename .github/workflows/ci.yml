@@ -19,7 +19,8 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Solution_Name: src\ComponentSamples.sln
+      Solution_Name1: src\ComponentSamplesBeingReferenced.sln
+      Solution_Name2: src\ComponentSamples.sln
       Configuration: ${{ matrix.configuration }}
 
     steps:
@@ -32,13 +33,16 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      run: |
+        msbuild $env:Solution_Name1 /t:Restore /p:Configuration=$env:Configuration
+        msbuild $env:Solution_Name2 /t:Restore /p:Configuration=$env:Configuration
 
     - name: Build plugins
       shell: powershell
       run: |
         $null = New-Item bld -ItemType Directory -Force
-        msbuild $env:Solution_Name /t:Build /p:Configuration=$env:Configuration | % {
+        msbuild $env:Solution_Name1 /t:Build /p:Configuration=$env:Configuration
+        msbuild $env:Solution_Name2 /t:Build /p:Configuration=$env:Configuration | % {
           Write-Host $_
           $_ | Select-String '(?<project>\w+) -> (?<outputpath>.+)$' | % {
             [pscustomobject]@{
