@@ -31,22 +31,13 @@ jobs:
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
+      with:
+        msbuild-architecture: x64
 
     - name: Restore
       run: |
         msbuild $env:Solution_Name1 /t:Restore /p:Configuration=$env:Configuration
         msbuild $env:Solution_Name2 /t:Restore /p:Configuration=$env:Configuration
-
-    - name: List installed packages for debug
-      shell: powershell
-      run: |
-        gci env:\ | select Name, Value | Export-Csv env-github.csv -NoTypeInformation
-
-    - name: Upload packages for debug
-      uses: actions/upload-artifact@v4
-      with:
-        name: env-${{ matrix.configuration }}
-        path: .\env-github.csv
 
     - name: Build
       shell: powershell
