@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    runs-on: windows-latest
+
+    env:
+      Solution_Name: src\ComponentSamples.sln
+      Configuration: ${{ matrix.configuration }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Restore the application
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+
+    - name: Build plugins
+      shell: powershell
+      run: |
+        Get-ChildItem *.*proj -Recurse -Depth 1 | % {
+          msbuild $_.FullName /t:Build "/p:OutputPath=$([io.path]::Combine($PWD, 'bld', $env:Configuration, $_.BaseName))" /p:Configuration=$env:Configuration /p:Platform=x64
+        }
+
+    - name: Compress assets
+      if: startsWith(github.ref, 'refs/tags/v')
+      shell: powershell
+      run: |
+        $assetsDir = New-Item $PWD\bld\assets -ItemType Directory -Force
+        Get-ChildItem bld\$env:Configuration -Directory | % {
+          $debugTag = if ($env:Configuration -eq 'Debug') {'-debug'} else {''}
+          $dest = '{0}-{1}-x64{2}.zip' -f (Join-Path $assetsDir $_.Name), $env:TAG, $debugTag
+          Get-ChildItem $_ | Compress-Archive -DestinationPath $dest
+        }
+      env:
+        TAG: ${{ github.ref_name }}
+
+    - name: Upload ${{ matrix.configuration }} artifacts
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.configuration }}
+        path: .\bld\assets\
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      
+      - name: Create release
+        run: gh release create ${{ github.ref_name }} --generate-notes --draft ./*.zip
+        env:
+          GH_TOKEN: ${{ github.token }}
