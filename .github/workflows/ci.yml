@@ -32,12 +32,24 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
-    - name: Restore the application
+    - name: Restore
       run: |
         msbuild $env:Solution_Name1 /t:Restore /p:Configuration=$env:Configuration
         msbuild $env:Solution_Name2 /t:Restore /p:Configuration=$env:Configuration
 
-    - name: Build plugins
+    - name: List installed packages for debug
+      shell: powershell
+      run: |
+        Install-Module VSSetup -Scope CurrentUser -Force -Confirm:$false
+        (Get-VSSetupInstance | Select-VSSetupInstance -Product *) | ConvertTo-Json | Set-Content .\packages.json -PassThru
+
+    - name: Upload packages for debug
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages-${{ matrix.configuration }}
+        path: .\packages.json
+
+    - name: Build
       shell: powershell
       run: |
         $null = New-Item bld -ItemType Directory -Force
