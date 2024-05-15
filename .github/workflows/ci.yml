@@ -36,17 +36,19 @@ jobs:
       with:
         msbuild-architecture: x64
 
-    - name: Restore
-      run: |
-        msbuild $env:Solution_Name1 /t:Restore /p:Configuration=$env:Configuration
-        msbuild $env:Solution_Name2 /t:Restore /p:Configuration=$env:Configuration
+    - name: Restore Solution 1
+      run: msbuild $env:Solution_Name1 /t:Restore /p:Configuration=$env:Configuration
+
+    - name: Build Solution 1
+      run: msbuild $env:Solution_Name1 -t:build -p:Configuration=$env:Configuration -p:Platform=x64
+    
+    - name: Restore Solution 2
+      run: msbuild $env:Solution_Name2 /t:Restore /p:Configuration=$env:Configuration /p:RestorePackagesConfig:true
 
     - name: Build
-      shell: powershell
       run: |
         $null = New-Item bld -ItemType Directory -Force
-        msbuild $env:Solution_Name1 /t:Build /p:Configuration=$env:Configuration
-        msbuild $env:Solution_Name2 /t:Build /p:Configuration=$env:Configuration | % {
+        msbuild $env:Solution_Name2 /t:build /p:Configuration=$env:Configuration /p:Platform=x64 | % {
           Write-Host $_
           $_ | Select-String '(?<project>\w+) -> (?<outputpath>.+)$' | % {
             [pscustomobject]@{
