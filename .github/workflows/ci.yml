@@ -36,29 +36,34 @@ jobs:
       with:
         msbuild-architecture: x64
 
-    - name: Restore Solution 1
+    - name: Restore ComponentSamplesBeingReferenced.sln
       run: msbuild $env:Solution_Name1 /t:Restore /p:Configuration=$env:Configuration
 
-    - name: Build Solution 1
+    - name: Build ComponentSamplesBeingReferenced.sln
       run: msbuild $env:Solution_Name1 -t:build -p:Configuration=$env:Configuration -p:Platform=x64
     
-    - name: Restore Solution 2
+    - name: src\ComponentSamples.sln
       run: msbuild $env:Solution_Name2 /t:Restore /p:Configuration=$env:Configuration /p:RestorePackagesConfig=true
 
-    - name: Build
+    - name: Build src\ComponentSamples.sln
       run: |
         $null = New-Item bld -ItemType Directory -Force
         msbuild $env:Solution_Name2 /t:build /p:Configuration=$env:Configuration /p:Platform=x64 | % {
           Write-Host $_
           $_ | Select-String '(?<project>\w+) -> (?<outputpath>.+)$' | % {
-            [pscustomobject]@{
+            $artifact = [pscustomobject]@{
               Project   = $_.Matches[0].Groups['project'].Value
               Directory = ([io.fileinfo]$_.Matches[0].Groups['outputpath'].Value).DirectoryName
             }
+            if ($artifact.Project -in @('vcxproj')) {
+              Write-Host "Artifact will not be packaged for release: $($artifact.Directory)"
+              return
+            }
+            $artifact
           }
         } | Export-Csv bld\projects.csv -NoTypeInformation
 
-    - name: Compress assets
+    - name: Compress artifacts
       if: startsWith(github.ref, 'refs/tags/v')
       shell: powershell
       run: |
