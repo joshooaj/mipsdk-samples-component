@@ -38,10 +38,13 @@ jobs:
       shell: powershell
       run: |
         $null = New-Item bld -ItemType Directory -Force
-        msbuild $env:Solution_Name /t:Build /p:Configuration=$env:Configuration | Select-String '(?<project>\w+) -> (?<outputpath>.+)$' | % {
-          [pscustomobject]@{
-            Project   = $_.Matches[0].Groups['project'].Value
-            Directory = ([io.fileinfo]$_.Matches[0].Groups['outputpath'].Value).DirectoryName
+        msbuild $env:Solution_Name /t:Build /p:Configuration=$env:Configuration | % {
+          Write-Host $_
+          $_ | Select-String '(?<project>\w+) -> (?<outputpath>.+)$' | % {
+            [pscustomobject]@{
+              Project   = $_.Matches[0].Groups['project'].Value
+              Directory = ([io.fileinfo]$_.Matches[0].Groups['outputpath'].Value).DirectoryName
+            }
           }
         } | Export-Csv bld\projects.csv -NoTypeInformation
 
