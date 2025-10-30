@@ -1,6 +1,6 @@
 ---
 description: The AudioDemo sample shows how a microphone can be selected
-  and the use of the AudioPlayerControl. The login credentials used in
+  and the use of the AudioPlayer. The login credentials used in
   this sample is a current Windows credentials.
 keywords: Component integration
 lang: en-US
@@ -10,7 +10,7 @@ title: Audio Demo
 # Audio Demo
 
 The AudioDemo sample shows how a microphone can be selected and the use
-of the AudioPlayerControl. The login credentials used in this sample is
+of the AudioPlayer. The login credentials used in this sample is
 a current Windows credentials.
 
 When a microphone has been selected the incoming audio from that
@@ -21,13 +21,12 @@ microphone is played on the PC\'s speakers.
 ## The sample demonstrates
 
 - Initialization of MIP .NET Library, when audio playback is required
-- How to use the ItemPickerForm to select a microphone
+- How to use the ItemPickerWpfWindow to select a microphone
 
 ## Using
 
-- VideoOS.Platform.ClientControl
-- VideoOS.Platform.UI.ItemPickerForm
-- VideoOS.Platform.UI.AudioPlayerControl
+- VideoOS.Platform.UI.ItemPickerWpfWindow
+- VideoOS.Platform.Client.AudioPlayer
 
 ## Environment
 

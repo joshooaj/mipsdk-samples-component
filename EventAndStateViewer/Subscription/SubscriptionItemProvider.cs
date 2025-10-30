@@ -39,6 +39,7 @@ namespace EventAndStateViewer.Subscription
                 new Item(new FQID(new ServerId(), Guid.Empty, Kind.Speaker, FolderType.No, Kind.Speaker) { ObjectIdString = "speakers" }, "Speakers"),
                 new Item(new FQID(new ServerId(), Guid.Empty, Kind.Output, FolderType.No, Kind.Output) { ObjectIdString = "outputs" }, "Outputs"),
                 new Item(new FQID(new ServerId(), Guid.Empty, Kind.InputEvent, FolderType.No, Kind.InputEvent) { ObjectIdString = "inputEvents" }, "Input events"),
+                new Item(new FQID(new ServerId(), Guid.Empty, Kind.Metadata, FolderType.No, Kind.Metadata) { ObjectIdString = "metadata" }, "Metadata"),
                 new Item(new FQID(new ServerId(), Guid.Empty, Kind.TriggerEvent, FolderType.No, Kind.TriggerEvent) { ObjectIdString = "userDefinedEvents" }, "User-defined events"),
             };
         }
