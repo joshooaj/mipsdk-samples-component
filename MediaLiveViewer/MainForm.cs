@@ -381,7 +381,7 @@ namespace MediaLiveViewer
 					_jpegLiveSource.Width = 80;
 					_jpegLiveSource.Height = 80;
 					_jpegLiveSource.SetWidthHeight();
-					_jpegLiveSource.SetCropRectangle(100, 100, 80, 80);
+					_jpegLiveSource.SetCropRectangle(0.5, 0.5, 0.5, 0.5);
 				}
 				else
 				{

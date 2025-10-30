@@ -6,24 +6,47 @@
              xmlns:local="clr-namespace:MultiUserEnvironment"
              xmlns:platformUiControls="clr-namespace:VideoOS.Platform.UI.Controls;assembly=VideoOS.Platform"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="500" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="125"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="75"/>
+            <RowDefinition Height="50" />
             <RowDefinition Height="10" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid>
+        <Grid x:Name="AuthenticationTypeSelection">
             <Grid.RowDefinitions>
-                <RowDefinition />
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <platformUiControls:VideoOSTextBlockBodySmall Text="Authentication type:" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <platformUiControls:VideoOSDropDownSmall x:Name="_authenticationTypeDropDown" Grid.Column="1" Margin="5" HorizontalAlignment="Left" Width="200"
+                                                             SelectedItem="{Binding Path=SelectedAuthenticationType}"
+                                                             ItemsSource="{Binding Path=AuthenticationTypes}" ItemDataPropertyName="Name" />
+        </Grid>
+
+        <Grid x:Name="BasicOrNegotiateAuthentication" Grid.Row="1" Visibility="{Binding IsBasicOrNegotiateAuthType, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="150" />
             </Grid.ColumnDefinitions>
 
             <platformUiControls:VideoOSTextBlockBodySmall Text="Username:" HorizontalAlignment="Left" VerticalAlignment="Center" />
@@ -32,12 +55,6 @@
             <platformUiControls:VideoOSTextBlockBodySmall Text="Password:" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" />
             <platformUiControls:VideoOSPasswordBoxSmall x:Name="_passwordBox" Margin="5,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" />
 
-            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                <platformUiControls:VideoOSButtonPrimaryMedium x:Name="_onLogonButton" Margin="5" Content="Logon" Click="OnLogon" />
-                <platformUiControls:VideoOSButtonPrimaryMedium x:Name="_onLogoutButton" Margin="5" Content="Logout" Click="OnLogout" IsEnabled="False" />
-            </StackPanel>
-
-
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" Grid.Column="2" Grid.RowSpan="2">
                 <StackPanel.Resources>
                     <Style TargetType="{x:Type platformUiControls:VideoOSRadioButtonSmall}">
@@ -45,13 +62,34 @@
                     </Style>
                 </StackPanel.Resources>
 
-                <platformUiControls:VideoOSRadioButtonSmall x:Name="_negotiateAuthTypeRadioButton" GroupName="{Binding AuthTypeGroupName}" Content="AD User" IsChecked="True"/>
-                <platformUiControls:VideoOSRadioButtonSmall x:Name="_basicAuthTypeRadioButton" GroupName="{Binding AuthTypeGroupName}" Content="Basic User" />
                 <platformUiControls:VideoOSCheckBoxSmall x:Name="_useOAuthTokenCheckBox" Margin="2" Content="Use OAuth token" />
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="2">
+        <Grid x:Name="ExternalAuthentication" Grid.Row="1" Visibility="{Binding IsExternalAuthType, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <platformUiControls:VideoOSTextBlockBodySmall Text="OAuth token:" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <platformUiControls:VideoOSTextBoxLarge x:Name="_OAuthTokenTextBox" Grid.Column="1" Margin="5" TextWrapping="Wrap" />
+        </Grid>
+
+        <Grid x:Name="LoginLogout" Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                <platformUiControls:VideoOSButtonPrimaryMedium x:Name="_onLogonButton" Margin="5" Content="Logon" Click="OnLogon" />
+                <platformUiControls:VideoOSButtonPrimaryMedium x:Name="_onLogoutButton" Margin="5" Content="Logout" Click="OnLogout" IsEnabled="False" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="4">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="50"/>

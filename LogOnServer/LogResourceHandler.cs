@@ -17,10 +17,12 @@ namespace LogOnServer
 
         internal static void RegisterMyMessages()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             LogMessageDictionary lmd1 = new LogMessageDictionary("en-US", "3.9", _myApplication, _myComponent,
                                                                 BuildDictionary("en-US"), "AccessControl");
             LogMessageDictionary lmd2 = new LogMessageDictionary("da-DK", "3.9", _myApplication, _myComponent,
                                                                 BuildDictionary("da-DK"), "AccessControl");
+#pragma warning restore CS0618 // Type or member is obsolete
             VideoOS.Platform.Log.LogClient.Instance.RegisterDictionary(lmd1);
             VideoOS.Platform.Log.LogClient.Instance.RegisterDictionary(lmd2);
         }
