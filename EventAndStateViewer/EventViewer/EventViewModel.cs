@@ -1,4 +1,5 @@
 ﻿using EventAndStateViewer.Mvvm;
+using Microsoft.Extensions.Logging;
 using System;
 using VideoOS.Platform.EventsAndState;
 using VideoOS.Platform.EventsData;
@@ -30,6 +31,14 @@ namespace EventAndStateViewer.EventViewer
                     var action = dataPart.Action;
 
                     return string.Format("Action={2}, Path={0}, Name={1}", related.RelatedItemRestResource, related.Name, action);
+                }
+                if (_event.Source.StartsWith("userDefinedEvents"))
+                {
+                    var related = _event.JsonData?.GetChild("related");
+                    if (related != null)
+                    {
+                        return string.Format("related={0}", related.ToJson());
+                    }
                 }
                 return string.Empty;
             }

@@ -105,6 +105,8 @@ namespace ConfigAPIClient
                                                            ItemTypes.AccessControlSystemFolder,
                                                            ItemTypes.AccessControlUnit,
                                                            ItemTypes.AccessControlUnitFolder,
+                                                           ItemTypes.AccessControlGroup,
+                                                           ItemTypes.AccessControlGroupFolder,
                                                            ItemTypes.Site,
                                                            ItemTypes.SiteFolder,
                                                            ItemTypes.LicenseInformationFolder,

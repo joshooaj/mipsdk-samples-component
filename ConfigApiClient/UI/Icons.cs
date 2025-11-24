@@ -250,6 +250,9 @@ namespace ConfigAPIClient.UI
                 ObjectTypeToIndex.Add(VideoOS.ConfigurationAPI.ItemTypes.AccessControlUnit, AccessControlDoorIconIx);
                 ObjectTypeToIndex.Add(VideoOS.ConfigurationAPI.ItemTypes.AccessControlUnitFolder, FolderIconIx);
 
+                ObjectTypeToIndex.Add(VideoOS.ConfigurationAPI.ItemTypes.AccessControlGroup, AccessControlSystemIconIx);
+                ObjectTypeToIndex.Add(VideoOS.ConfigurationAPI.ItemTypes.AccessControlGroupFolder, FolderIconIx);
+
                 ObjectTypeToIndex.Add(VideoOS.ConfigurationAPI.ItemTypes.Rule, RuleIconIx);
                 ObjectTypeToIndex.Add(VideoOS.ConfigurationAPI.ItemTypes.RuleFolder, FolderIconIx);
 

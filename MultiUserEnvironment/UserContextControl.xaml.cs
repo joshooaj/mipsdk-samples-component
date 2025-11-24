@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using VideoOS.Platform;
 using VideoOS.Platform.Live;
+using VideoOS.Platform.Login;
 using VideoOS.Platform.SDK.OAuth;
 using VideoOS.Platform.UI;
 
@@ -31,11 +32,51 @@ namespace MultiUserEnvironment
 
         public ObservableCollection<Item> CamerasUserContext { get; } = new ObservableCollection<Item>();
 
+
         private ConfigurationMonitor _configurationMonitor;
         public ConfigurationMonitor ConfigurationMonitor { get => _configurationMonitor; set => _configurationMonitor = value; }
         public Uri ServerUri { get; set; }
         public string AuthTypeGroupName { get; set; }
 
+        #region AuthenticationType
+        public static List<string> AuthenticationTypes { get; } = new List<string> { AuthenticationType.Basic, AuthenticationType.Negotiate, AuthenticationType.External };
+
+        private string _selectedAuthenticationType;
+        public string SelectedAuthenticationType
+        {
+            get => _selectedAuthenticationType;
+            set
+            {
+                _selectedAuthenticationType = value;
+                OnPropertyChanged(nameof(SelectedAuthenticationType));
+
+                IsExternalAuthType = value == AuthenticationType.External;
+                IsBasicOrNegotiateAuthType = value == AuthenticationType.Negotiate || value == AuthenticationType.Basic;
+            }
+        }
+
+        private bool _isExternalAuthType;
+        private bool _isBasicOrNegotiateAuthType;
+        public bool IsExternalAuthType
+        {
+            get => _isExternalAuthType;
+            set
+            {
+                _isExternalAuthType = value;
+                OnPropertyChanged(nameof(IsExternalAuthType));
+            }
+        }
+
+        public bool IsBasicOrNegotiateAuthType
+        {
+            get => _isBasicOrNegotiateAuthType;
+            set
+            {
+                _isBasicOrNegotiateAuthType = value;
+                OnPropertyChanged(nameof(IsBasicOrNegotiateAuthType));
+            }
+        }
+        #endregion AuthenticationType
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
@@ -97,18 +138,54 @@ namespace MultiUserEnvironment
         private void OnLogon(object sender, RoutedEventArgs e)
         {
             Cursor = Cursors.Wait;
+
             try
             {
-                var useOAuth = _useOAuthTokenCheckBox.IsChecked ?? false;
-                var isAdUser = _negotiateAuthTypeRadioButton.IsChecked ?? false;
-                if (useOAuth)
+                // Create user context based on selected authentication type
+                if (SelectedAuthenticationType == AuthenticationType.External)
                 {
-                    MipTokenCache tokenCache = IdpHelper.GetTokenCache(ServerUri, _userNameBox.Text, _passwordBox.Password, isAdUser);
-                    _userContext = VideoOS.Platform.SDK.MultiUserEnvironment.CreateUserContext(tokenCache);
+                    // For External, use the OAuth token generated from another application
+                    // For more information on how to generate the token, see the OAuth Login Flow protocol sample
+                    var tokenCache = new ManualMipTokenCache(_OAuthTokenTextBox.Text);
+                    _userContext = VideoOS.Platform.SDK.MultiUserEnvironment.CreateUserContext(mipTokenCache: tokenCache, SelectedAuthenticationType);
                 }
                 else
                 {
-                    _userContext = VideoOS.Platform.SDK.MultiUserEnvironment.CreateUserContext(_userNameBox.Text, _passwordBox.Password, isAdUser);
+                    // Get user input values
+                    string username = _userNameBox.Text;
+                    string password = _passwordBox.Password;
+                    bool useOAuth = _useOAuthTokenCheckBox.IsChecked ?? false;
+
+                    if (SelectedAuthenticationType == AuthenticationType.Negotiate)
+                    {
+                        // For Negotiate, use AD user (isAdUser = true)
+                        if (useOAuth)
+                        {
+                            // Use OAuth token for AD user
+                            MipTokenCache tokenCache = IdpHelper.GetTokenCache(ServerUri, username, password, isAdUser: true);
+                            _userContext = VideoOS.Platform.SDK.MultiUserEnvironment.CreateUserContext(mipTokenCache: tokenCache, SelectedAuthenticationType);
+                        }
+                        else
+                        {
+                            // Use username/password for AD user
+                            _userContext = VideoOS.Platform.SDK.MultiUserEnvironment.CreateUserContext(username, password, usingAd: true);
+                        }
+                    }
+                    else // Basic
+                    {
+                        // For Basic, use non-AD user (isAdUser = false)
+                        if (useOAuth)
+                        {
+                            // Use OAuth token for Basic user
+                            MipTokenCache tokenCache = IdpHelper.GetTokenCache(ServerUri, username, password, isAdUser: false);
+                            _userContext = VideoOS.Platform.SDK.MultiUserEnvironment.CreateUserContext(mipTokenCache: tokenCache, SelectedAuthenticationType);
+                        }
+                        else
+                        {
+                            // Use username/password for Basic user
+                            _userContext = VideoOS.Platform.SDK.MultiUserEnvironment.CreateUserContext(username, password, usingAd: false);
+                        }
+                    }
                 }
 
                 VideoOS.Platform.SDK.MultiUserEnvironment.LoginUserContext(_userContext);

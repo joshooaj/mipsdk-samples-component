@@ -225,6 +225,9 @@ namespace ConfigAPIClient
                     case ItemTypes.View:
                         item = _client.GetItem("/ViewGroupFolder");
                         break;
+                    case ItemTypes.AccessControlUnit:
+                        item = _client.GetItem("/AccessControlSystemFolder");
+                        break;
                     default:
                         item = _client.GetItem("/"); 
                         break;
@@ -269,6 +272,7 @@ namespace ConfigAPIClient
                         {
                             if (child.ItemType == ItemTypes.RecordingServer && itemtype != ItemTypes.HardwareDriver
                                 || child.ItemType == ItemTypes.MIPKind && itemtype == ItemTypes.MIPItem
+                                || child.ItemType == ItemTypes.AccessControlSystem && itemtype == ItemTypes.AccessControlUnit
                                 || child.ItemType == ItemTypes.VideoWall &&(itemtype == ItemTypes.Monitor || itemtype == ItemTypes.VideoWallPreset)
                                 || child.ItemType == ItemTypes.FailoverGroup && itemtype == ItemTypes.FailoverRecorder)
                             {

@@ -21,7 +21,7 @@ Making the REST API call is done using a bearer token in the authorization heade
 
 - XProtect 2021 R2 or later
 - The API Gateway installed on the same host as the management server
-- A basic user with the Administrators role
+- An XProtect user with the Administrators role
 - A PTZ camera with PTZ Presets (needed to test "cameras and tasks"; the sample
   can be run without a PTZ camera)
 
